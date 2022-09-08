@@ -1,0 +1,120 @@
+
+
+#include <iostream>
+#include <stdio.h>
+#include <vector>
+#include <fstream>
+
+using namespace std;
+
+
+
+
+class PasswordFile{
+    public:
+    PasswordFile(string filename){
+        ifstream input(filename);                               // set input variable to filename
+        if (!input.is_open()) cout << "Error opening file\n";   // check if file is good and can be openend
+        string userIn, passIn;                                  // declare some variables to store user and password
+        while (input.good())
+        {
+            // set current line of stuff to user and password
+            getline(input, userIn, ' ');
+            getline(input, passIn, '\n');  //  <---------------------------- MIGHT NEED ADDRESSING
+            user.push_back(userIn);
+            password.push_back(passIn);
+        }
+
+        /*  FOR TESTING PURPOSES (PRINT OUT THE VECTORS TO ENSURE THE DATA IS BEING STORED PROPERLY)
+        cout << "\n test \n";
+        for (int i=0; i < user.size(); i++){
+            cout << i << " - " << user.at(i) << " = " << password.at(i) << endl;
+        }
+        */
+    }
+
+    void addpw(string newuser, string newpassword){
+        bool flag1 = false; // flag if user exists dont add usr and pwd
+        for (int i=0; i < user.size(); i++){
+            if (user.at(i) == newuser){         
+                cout << "\n ERROR: User already exists";
+                flag1 = true;
+            }
+        }
+
+        if (!flag1){
+            // user does NOT exist, so can add into vector
+            // =-=-=-=-=-=-=-=-=-=-=-= FOR ENCRYPTION SECTIONS
+            // string saltedPass = hash(newpassword);
+            user.push_back(newuser);
+            password.push_back(newpassword); // -=-=-=-=-=-=-=-=-=- then switch newpassword with saltedPass
+            cout << "\n Successfully added new user\n";
+            synch(); 
+            cout << "\n Successfully synchronized data\n";
+        }
+    }
+
+    // =-=-=-=-=-=-=-= FOR ENCRYPTION SECTIONS -=-=-=-=-=-=-=-=-=-
+    // will need to take user input and salt it, then check if that salt matches the database (example in function)
+    bool checkpw(string usr, string passwd){ // returns true if user exists and password matches
+        // string tmpPass = hash(passwd);
+        for (int i=0; i < user.size(); i++){
+            if (user.at(i) == usr){                
+                if (password.at(i) == passwd){ // -=-=-=-=-=-=-=- then change usr to tmpPass
+                    cout << "\n Correct password!\n";
+                    return true;
+                }
+                cout << "Incorrect password"; // MIGHT HAVE SECURITY ISSUES, TALK W/ PROFESSOR
+                return false;
+            }
+        }
+        cout << "\nERROR: Code 1\n";
+        return false;
+    }
+
+    private: 
+    string filename;
+    vector<string> user; 
+    vector<string> password;
+    
+    void synch(){
+        if (remove("password.txt") != 0)
+            cout << "error deleting file";
+        else{
+            ofstream outfile("password.txt");
+            for (int i=0; i < user.size(); i++){
+                outfile << user.at(i) << " " << password.at(i) << "\n";
+            }
+        }
+    }
+
+
+
+};
+
+
+
+
+int main()
+{
+ PasswordFile passfile("password.txt");
+
+ passfile.addpw("dbotting","123qwe");
+ passfile.addpw("egomez","qwerty");
+ passfile.addpw("tongyu","liberty");
+ // write some lines to see if passwords match users
+ passfile.checkpw("mike", "1233");
+}
+
+
+// error when user exists, but the next addpw that doesnt already exist will paste extra password from failed attempt
+
+/*
+
+mike 123
+neff 456
+dbotting 123qwe    <----- user already existed
+ 123qwe
+egomez qwerty     <---- didnt exist, but line above contains failed attempt from above
+tongyu liberty
+*/
