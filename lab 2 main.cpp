@@ -1,13 +1,7 @@
 // main cpp contains all the functions that the class will be using in the header file
-//#include "sdisk.h"
-#include <iostream>
-#include <stdio.h>
-#include <vector>
-#include <fstream>
+#include "sdisk.h"
 
-// create some stubs
-
-int Sdisk::getblock(int blocknumber, int buffer){
+int Sdisk::getblock(int blocknumber, string& buffer){
   iofile.seekg(blocknumber * blocksize);
   buffer.clear();
   char c;
@@ -18,7 +12,7 @@ int Sdisk::getblock(int blocknumber, int buffer){
   }
 }
 
-int Sdisk::putblock(int blocknumber, int buffer){
+int Sdisk::putblock(int blocknumber, string buffer){
   fstream iofile;
   iofile.open(diskname.c_str(), ios::in | ios::out);
   if (blocknumber < 0 || blocknumber >= numberofblocks){
@@ -28,7 +22,7 @@ int Sdisk::putblock(int blocknumber, int buffer){
 
   iofile.seekp(blocksize * blocknumber);
   for (int i = 0; i < blocksize; i++){
-    iofile.put(buffer[i]);
+    iofile.put(buffer[i]); /////////// buff.at(i);
   }
 }
 
