@@ -18,3 +18,4 @@ class Sdisk{
     int numberofblocks;     // number of blocks on disk
     int blocksize;          // block size in bytes
 };
+
